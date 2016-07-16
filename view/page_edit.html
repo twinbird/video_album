@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ページ編集</title>
+		<!-- jquery -->
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+		<!-- bootstrap>> -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<!-- <<bootstrap -->
+
+		<!-- origin -->
+		<link rel="stylesheet" href="/assets/common.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-offset-9 col-xs-3">
+					<div class="form-inline">
+						<form action="/auth/delete" method="POST" class="form-group">
+							<input type="submit" value="ログアウト" class="btn btn-link">
+						</form>
+						<span id="help-link"><a href="#">ヘルプ</a></span>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+				</div>
+			</div>
+
+			<hr>
+
+			<div class="row" id="album-list-header">
+				<div class="col-xs-4">
+					<h4>{{.Album.Title}}</h4>
+				</div>
+				<div class="col-xs-offset-5 col-xs-2">
+					<a href="/get_album?album_id={{.Album.Id}}" class="btn btn-info">アルバムへ戻る</a>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-offset-2 col-xs-6">
+					<form action="/save_page" method="POST" enctype="multipart/form-data">
+						<div class="form-group">
+							<label for="page_name">ページ名</label>
+							{{if .SelectPage}}
+							<input type="text" name="title" value="{{.SelectPage.Title}}" class="form-control" placeholder="ページ名を入力" maxlength="32" required>
+							{{else}}
+							<input type="text" name="title" value="" class="form-control" placeholder="ページ名を入力" maxlength="32" required>
+							{{end}}
+							<span class="help-block">※1〜32文字で名付けてください.</span>
+						</div>
+						<div class="form-group">
+							<label for="video">ビデオ</label>
+							<!-- 登録済のみ下記表示 -->
+							{{if .SelectPage}}
+							{{if .SelectPage.MoviePath}}
+								<div align="center" class="embed-responsive embed-responsive-16by9">
+									<video id="video" controls class="embed-responsive-item">
+										<source src="movies/{{.SelectPage.MoviePath}}" type="video/mp4">
+									</video>
+								</div>
+								{{end}}
+							{{else}}
+							<input type="file" name="video" class="form-control" accept=".mp4, .m4v">
+							<span class="help-block">※.mp4または.m4v形式のみ利用できます.</span>
+							{{end}}
+						</div>
+						<div class="form-group">
+							<label for="description">説明</label>
+							{{if .SelectPage}}
+							<textarea name="description" class="form-control" rows="10" placeholder="このビデオや手順に関わる説明を記入してください" maxlength="1200">{{.SelectPage.Description}}</textarea>
+							{{else}}
+							<textarea name="description" class="form-control" rows="10" placeholder="このビデオや手順に関わる説明を記入してください" maxlength="1200"></textarea>
+							{{end}}
+							<span class="help-block">※1200文字以内で記入してください.</span>
+						</div>
+						<input type="hidden" name="album_id" value="{{.Album.Id}}">
+						{{if .SelectPage}}
+						<input type="hidden" name="page_id" value="{{.SelectPage.Id}}">
+						{{end}}
+						<input type="submit" value="登録" class="form-control btn btn-primary">
+						{{if .SelectPage}}
+						<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-video-modal">このページを削除</button>
+						{{end}}
+					</form>
+				</div>
+			</div>
+		</div>
+
+		{{if .SelectPage}}
+		<!-- ページ削除モーダル -->
+		<div class="modal" id="delete-video-modal" tabindex="-1">
+			<div class="modal-dialog">
+				<form action="/delete_page" method="POST">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">このページを削除します.よろしいですか?</h4>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">キャンセル</button>
+							<input type="submit" class="btn btn-danger" value="削除">
+							<input type="hidden" name="page_id" value="{{.SelectPage.Id}}">
+							<input type="hidden" name="album_id" value="{{.Album.Id}}">
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		{{end}}
+	</body>
+</html>

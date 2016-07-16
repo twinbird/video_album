@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ページ一覧</title>
+		<!-- jquery -->
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+		<!-- bootstrap>> -->
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<!-- <<bootstrap -->
+
+		<!-- origin -->
+		<link rel="stylesheet" href="/assets/common.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-offset-9 col-xs-3">
+					<div class="form-inline">
+						<form action="/auth/delete" method="POST" class="form-group">
+							<input type="submit" value="ログアウト" class="btn btn-link">
+						</form>
+						<span id="help-link"><a href="#">ヘルプ</a></span>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-4">
+				</div>
+			</div>
+
+			<hr>
+
+			<div class="row" id="album-list-header">
+				<div class="col-xs-4">
+					<h4>{{.Album.Title}}</h4>
+				</div>
+				<div class="col-xs-offset-4 col-xs-4">
+					<button class="btn btn-danger" data-toggle="modal" data-target="#delete-album-modal">アルバム削除</button>
+					<a href="/get_albums" class="btn btn-info">アルバム一覧へ戻る</a>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="list-group">
+						{{$album_id := .Album.Id}}
+						{{if .SelectPage}}
+							{{$select_page_id := .SelectPage.Id}}
+							{{range .Pages}}
+								{{if eq .Id $select_page_id}}
+								<a href="/get_album?album_id={{$album_id}}&page_id={{.Id}}" class="list-group-item active"> {{.Title}} </a>
+								{{else}}
+								<a href="/get_album?album_id={{$album_id}}&page_id={{.Id}}" class="list-group-item"> {{.Title}} </a>
+								{{end}}
+							{{end}}
+						{{end}}
+					</div>
+					<a href="/new_page?album_id={{.Album.Id}}" class="btn btn-primary">ページを追加</a>
+					{{if .SelectPage}}
+					<a href="/edit_page?album_id={{.Album.Id}}&page_id={{.SelectPage.Id}}" class="btn btn-warning">ページを編集</a>
+					{{end}}
+				</div>
+				<div class="col-xs-9">
+					{{if .SelectPage}}
+					<label for="video">{{.SelectPage.Title}}</label>
+					<div align="center" class="embed-responsive embed-responsive-16by9">
+						{{if .SelectPage.MoviePath}}
+						<video id="video" controls class="embed-responsive-item">
+							<source src="movies/{{.SelectPage.MoviePath}}" type="video/mp4">
+						</video>
+						{{else}}
+						<!-- 動画がないときは以下を表示 -->
+						<img id="video" src="/assets/no_image.png">
+						{{end}}
+					</div>
+					<label for="description">説明</label>
+					<pre id="description">{{.SelectPage.Description}}</pre>
+					{{end}}
+				</div>
+			</div>
+		</div>
+
+		<!-- アルバム削除のモーダル -->
+		<div class="modal" id="delete-album-modal" tabindex="-1">
+			<div class="modal-dialog">
+				<form action="/delete_album" method="POST" class="form-inline form-group">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">削除したアルバムは2度と戻すことはできません.本当によろしいですか?</h4>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">キャンセル</button>
+							<input type="hidden" name="album_id" value="{{.Album.Id}}">
+							<input type="submit" class="btn btn-danger" value="このアルバムを削除">
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	</body>
+</html>
